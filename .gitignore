@@ -40,6 +40,7 @@ Thumbs.db
 .eslintcache
 
 # SQLite (local dev DB)
+/data/
 *.db
 *.db-shm
 *.db-wal
