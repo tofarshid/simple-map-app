@@ -1,0 +1,8 @@
+.marker-list.scroll {
+  max-height: 385px;
+  overflow-y: auto;
+}
+
+.on-hover:hover {
+  text-decoration: underline !important;
+}

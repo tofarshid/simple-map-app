@@ -92,9 +92,11 @@ watch(
 </script>
 
 <template>
-  <div>
-    <h2 class="h5 mb-3">Map</h2>
-    <div id="map-leaflet" class="map-container"></div>
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Map</h2>
+      <div id="map-leaflet" class="map-container"></div>
+    </div>
   </div>
 </template>
 

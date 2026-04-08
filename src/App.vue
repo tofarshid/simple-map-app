@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import type { RootState, Location } from './store';
+
 import AppFooter from './components/AppFooter.vue';
 import AppHeader from './components/AppHeader.vue';
-import type { RootState, Location } from './store';
 import MapCard from './components/MapCard.vue';
+import MarkerList from './components/MarkerList.vue';
 
+// init
 const store = useStore<RootState>();
 const locations = computed(() => store.state.locations);
 const loading = computed(() => store.state.loading);
@@ -13,52 +16,32 @@ const error = computed(() => store.state.error);
 const locationCount = computed(() => store.getters.locationCount as number);
 const mapRef = ref<InstanceType<typeof MapCard> | null>(null);
 
-const handleMapClick = async ({ lat, long }: { lat: number; long: number }) => {
+// fn
+const handleMapClick = async ({ lat, long }: { lat: number; long: number }) =>
   await store.dispatch('saveLocation', { lat, long });
-};
-
 const flyToLocation = (location: Location) =>
   mapRef.value?.flyToLocation(location.id, location.lat, location.long);
 
+// hook
 onMounted(async () => await store.dispatch('getLocations'));
 </script>
 
 <template>
   <div class="d-flex flex-column min-vh-100">
     <AppHeader />
-
     <main class="container py-5 py-5">
       <section class="row g-4">
         <div class="col-12 col-lg-6">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <MapCard ref="mapRef" :locations="locations" @map-click="handleMapClick" />
-            </div>
-          </div>
+          <MapCard ref="mapRef" :locations="locations" @map-click="handleMapClick" />
         </div>
         <div class="col-12 col-lg-6">
-          <div class="card shadow-sm">
-            <div class="card-body">
-              <h2 class="h5 mb-3">Marker History | Count: {{ locationCount }}</h2>
-              <ul class="marker-list scroll ps-0">
-                <li
-                  v-for="location in locations"
-                  :key="location.id"
-                  class="d-flex justify-content-between"
-                  role="button"
-                >
-                  <a
-                    type="button"
-                    :title="` (${location.lat}, ${location.long})`"
-                    class="on-hover btn text-decoration-none text-start text-black ps-1"
-                    @click="($event) => flyToLocation(location)"
-                    ><b>{{ location.id + ': ' }}</b
-                    >{{ location.address }}</a
-                  >
-                </li>
-              </ul>
-            </div>
-          </div>
+          <MarkerList
+            :locations="locations"
+            :location-count="locationCount"
+            :loading="loading"
+            :error="error"
+            @select="flyToLocation"
+          />
         </div>
       </section>
     </main>
@@ -66,13 +49,3 @@ onMounted(async () => await store.dispatch('getLocations'));
     <AppFooter />
   </div>
 </template>
-
-<style scoped>
-.marker-list.scroll {
-  max-height: 385px;
-  overflow-y: auto;
-}
-.on-hover:hover {
-  text-decoration: underline !important;
-}
-</style>
