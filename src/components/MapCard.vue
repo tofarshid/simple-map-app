@@ -19,20 +19,43 @@ const emit = defineEmits<{
 
 let map: L.Map | null = null;
 let locationsLayer: L.LayerGroup | null = null;
+
 const handleMapClick = (event: L.LeafletMouseEvent) => {
   const lat = Number(event.latlng.lat.toFixed(6));
   const long = Number(event.latlng.lng.toFixed(6));
 
   emit('map-click', { lat, long });
 };
+
 const renderMarkers = () => {
   if (!map || !locationsLayer) return;
   locationsLayer.clearLayers();
 
   for (const location of props.locations) {
-    L.marker([location.lat, location.long]).addTo(locationsLayer).bindPopup(`${location.address}`);
+    L.marker([location.lat, location.long])
+      .addTo(locationsLayer)
+      .bindPopup(`${location.id} ${location.lat}, ${location.long}`);
   }
 };
+
+const flyToLocation = (id: number, lat: number, long: number) => {
+  if (!map) return;
+  map.flyTo([lat, long], 15, { duration: 1.2 });
+
+  if (!locationsLayer) return;
+  locationsLayer.eachLayer((layer) => {
+    if (!(layer instanceof L.Marker)) return;
+    const markerLatLng = layer.getLatLng();
+
+    if (markerLatLng.lat === lat && markerLatLng.lng === long) {
+      layer.bindPopup(`${id} ${lat}, ${long}`).openPopup();
+    }
+  });
+};
+
+defineExpose({
+  flyToLocation,
+});
 
 onMounted(() => {
   map = L.map('map-leaflet').setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM);
