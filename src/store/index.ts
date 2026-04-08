@@ -1,5 +1,6 @@
 import { createStore } from 'vuex';
 
+// types
 export interface Marker {
   id: number;
   lat: number;
@@ -18,6 +19,7 @@ interface SaveMarkerPayload {
   long: number;
 }
 
+// store init
 export const store = createStore<RootState>({
   state: {
     markers: [],

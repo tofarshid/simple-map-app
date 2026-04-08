@@ -1,53 +1,77 @@
 # simple-map-app
 
-Skeleton: **Vue 3** (Vite), **Vuex 4**, **TypeScript**, **Bootstrap 5**, **ESLint** (+ Oxlint), **Prettier**, **Git**.
+Vue 3 app with a **Leaflet** map, **Vuex** state, and a small **Express + SQLite** API for saved map markers.
 
-## Stack notes
+## Stack
 
-- Vuex typings: `tsconfig.app.json` maps `vuex` to `node_modules/vuex/types` because the package `exports` field omits `types` (see [vuex#issues](https://github.com/vuejs/vuex/issues)).
-- Format: `npm run format` (Prettier). Lint: `npm run lint`.
+| Layer | Tech |
+| --- | --- |
+| UI | Vue 3, TypeScript, Vite, Bootstrap 5 |
+| Map | Leaflet |
+| State | Vuex 4 |
+| API | Express 5, `sqlite3`, CORS |
+| Quality | ESLint, Oxlint, Prettier (`semi: true`) |
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Click the map to add a marker; the server **reverse-geocodes** coordinates (Nominatim) and stores **id, lat, long, address**.
+- Marker list in the sidebar; click an item to fly the map to that marker.
+- Default map center is configured in `src/constants/map.ts` (Parramatta area).
 
-## Recommended Browser Setup
+## Scripts
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+| Command | What it does |
+| --- | --- |
+| `npm install` | Install dependencies |
+| `npm run dev` | Runs **Vite** (client) and **API** together via `npm-run-all` |
+| `npm run dev:client` | Frontend only — [http://localhost:5173](http://localhost:5173) (or next free port) |
+| `npm run dev:server` | API only — [http://localhost:3001](http://localhost:3001) |
+| `npm run server` | Start API once (no watch) |
+| `npm run build` | `vue-tsc` + production Vite build |
+| `npm run preview` | Preview the production build |
+| `npm run type-check` | Type-check only |
+| `npm run lint` | Oxlint + ESLint |
+| `npm run format` | Prettier on `src/` |
 
-## Type Support for `.vue` Imports in TS
+## API
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Base URL in development: same origin as Vite, with `/api` **proxied** to the server (`vite.config.ts` → `http://localhost:3001`).
 
-## Customize configuration
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/health` | Health check |
+| `GET` | `/api/markers` | List markers (newest first) |
+| `POST` | `/api/markers` | Body: `{ "lat": number, "long": number }` — saves row and returns `{ id, lat, long, address }` |
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Optional: set `VITE_API_BASE_URL` if the client should call a different API origin (server still enables CORS).
 
-## Project Setup
+## Database
 
-```sh
-npm install
+- File: `data/app.db` (created on first run).
+- Table name in SQLite: **`locations`** (columns: `id`, `lat`, `long`, `address`).
+- The REST resource is named **markers**; only the DB table keeps the older name.
+
+## Project layout (high level)
+
+```
+src/
+  components/     App shell, MapCard, MarkerList
+  constants/      Map defaults (lat/lng/zoom)
+  store/          Vuex store (markers, API actions)
+  styles/         Scoped CSS pulled into components
+server/
+  index.ts        Express app + routes
+  db.ts           SQLite access
 ```
 
-### Compile and Hot-Reload for Development
+## TypeScript + Vuex
 
-```sh
-npm run dev
-```
+`tsconfig.app.json` maps the `vuex` module to `node_modules/vuex/types/index.d.ts` because Vuex’s package `exports` omit `types`. See [vuejs/vuex issues](https://github.com/vuejs/vuex/issues).
 
-### Type-Check, Compile and Minify for Production
+## IDE
 
-```sh
-npm run build
-```
+[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (disable Vetur if present).
 
-### Lint with [ESLint](https://eslint.org/)
+## Vite config
 
-```sh
-npm run lint
-```
+See [Vite configuration reference](https://vite.dev/config/).
