@@ -1,9 +1,11 @@
+import cors from 'cors';
 import express from 'express';
 import { getLocations, initializeDb, saveLocation } from './db';
 
 const app = express();
 const port = Number(process.env.PORT ?? 3001);
 
+app.use(cors());
 app.use(express.json());
 
 const reverseGeocode = async (lat: number, long: number): Promise<string> => {

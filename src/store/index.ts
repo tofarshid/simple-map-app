@@ -37,10 +37,11 @@ export const store = createStore<RootState>({
   },
   actions: {
     async getLocations({ commit }) {
+      const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
       commit('setLoading', true);
       commit('setError', null);
       try {
-        const response = await fetch('/api/locations');
+        const response = await fetch(`${apiBase}/api/locations`);
         if (!response.ok) {
           throw new Error('Failed to fetch locations');
         }
@@ -54,9 +55,10 @@ export const store = createStore<RootState>({
       }
     },
     async saveLocation({ dispatch, commit }, payload: SaveLocationPayload) {
+      const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
       commit('setError', null);
       try {
-        const response = await fetch('/api/locations', {
+        const response = await fetch(`${apiBase}/api/locations`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

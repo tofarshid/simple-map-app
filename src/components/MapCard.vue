@@ -1,24 +1,38 @@
 <script setup lang="ts">
 import L from 'leaflet';
-import { onBeforeUnmount, onMounted, ref, render } from 'vue';
+import { onBeforeUnmount, onMounted, watch } from 'vue';
 
 /** Default center (Sydney–Parramatta area) */
 const DEFAULT_LAT = -33.81315;
 const DEFAULT_LNG = 151.00745;
 const DEFAULT_ZOOM = 13;
 
+import type { Location } from '../store';
+
 const props = defineProps<{
-  location: [number, number, string] | null;
+  locations: Location[];
 }>();
 
 const emit = defineEmits<{
-  (event: 'map-click', payload: { lat: number; lng: number }): void;
+  (event: 'map-click', payload: { lat: number; long: number }): void;
 }>();
 
 let map: L.Map | null = null;
 let locationsLayer: L.LayerGroup | null = null;
-const handleMapClick = () => {};
-const renderMarkers = () => {};
+const handleMapClick = (event: L.LeafletMouseEvent) => {
+  const lat = Number(event.latlng.lat.toFixed(6));
+  const long = Number(event.latlng.lng.toFixed(6));
+
+  emit('map-click', { lat, long });
+};
+const renderMarkers = () => {
+  if (!map || !locationsLayer) return;
+  locationsLayer.clearLayers();
+
+  for (const location of props.locations) {
+    L.marker([location.lat, location.long]).addTo(locationsLayer).bindPopup(`${location.address}`);
+  }
+};
 
 onMounted(() => {
   map = L.map('map-leaflet').setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM);
@@ -44,6 +58,14 @@ onBeforeUnmount(() => {
     map = null;
   }
 });
+
+watch(
+  () => props.locations,
+  () => {
+    renderMarkers();
+  },
+  { deep: true },
+);
 </script>
 
 <template>
