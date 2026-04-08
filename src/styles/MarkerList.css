@@ -6,3 +6,7 @@
 .on-hover:hover {
   text-decoration: underline !important;
 }
+
+.set-height {
+  min-height: 472px;
+}

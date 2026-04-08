@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import L from 'leaflet';
 import { onBeforeUnmount, onMounted, watch } from 'vue';
+import { DEFAULT_MAP_LAT, DEFAULT_MAP_LNG, DEFAULT_MAP_ZOOM } from '../constants/map';
 import type { Marker } from '../store';
 
-/** Default center (Sydney–Parramatta area) */
-const DEFAULT_LAT = -33.81315;
-const DEFAULT_LNG = 151.00745;
-const DEFAULT_ZOOM = 13;
+// init
+let map: L.Map | null = null;
+let markersLayer: L.LayerGroup | null = null;
 
+// props & emit
 const props = defineProps<{
   markers: Marker[];
 }>();
@@ -16,13 +17,10 @@ const emit = defineEmits<{
   (event: 'map-click', payload: { lat: number; long: number }): void;
 }>();
 
-let map: L.Map | null = null;
-let markersLayer: L.LayerGroup | null = null;
-
+// fn
 const handleMapClick = (event: L.LeafletMouseEvent) => {
   const lat = Number(event.latlng.lat.toFixed(6));
   const long = Number(event.latlng.lng.toFixed(6));
-
   emit('map-click', { lat, long });
 };
 
@@ -52,12 +50,9 @@ const flyToMarker = (id: number, lat: number, long: number) => {
   });
 };
 
-defineExpose({
-  flyToMarker,
-});
-
+// hooks
 onMounted(() => {
-  map = L.map('map-leaflet').setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM);
+  map = L.map('map-leaflet').setView([DEFAULT_MAP_LAT, DEFAULT_MAP_LNG], DEFAULT_MAP_ZOOM);
   markersLayer = L.layerGroup().addTo(map);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -88,6 +83,8 @@ watch(
   },
   { deep: true },
 );
+
+defineExpose({ flyToMarker });
 </script>
 
 <template>
@@ -99,10 +96,4 @@ watch(
   </div>
 </template>
 
-<style scoped>
-.map-container {
-  width: 100%;
-  min-height: 400px;
-  z-index: 0;
-}
-</style>
+<style scoped src="../styles/MapCard.css"></style>

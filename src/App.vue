@@ -45,7 +45,6 @@ onMounted(async () => await store.dispatch('getMarkers'));
         </div>
       </section>
     </main>
-
     <AppFooter />
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Marker } from '../store';
 
+// props & emit
 defineProps<{
   markers: Marker[];
   markerCount: number;
@@ -14,7 +15,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="card shadow-sm">
+  <div class="card shadow-sm set-height">
     <div class="card-body">
       <h2 class="h5 mb-3">Marker History | Count: {{ markerCount }}</h2>
       <p v-if="loading" class="text-muted">Loading...</p>
