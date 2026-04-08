@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import L from 'leaflet';
 import { onBeforeUnmount, onMounted, watch } from 'vue';
+import type { Marker } from '../store';
 
 /** Default center (Sydney–Parramatta area) */
 const DEFAULT_LAT = -33.81315;
 const DEFAULT_LNG = 151.00745;
 const DEFAULT_ZOOM = 13;
 
-import type { Location } from '../store';
-
 const props = defineProps<{
-  locations: Location[];
+  markers: Marker[];
 }>();
 
 const emit = defineEmits<{
@@ -18,7 +17,7 @@ const emit = defineEmits<{
 }>();
 
 let map: L.Map | null = null;
-let locationsLayer: L.LayerGroup | null = null;
+let markersLayer: L.LayerGroup | null = null;
 
 const handleMapClick = (event: L.LeafletMouseEvent) => {
   const lat = Number(event.latlng.lat.toFixed(6));
@@ -28,38 +27,38 @@ const handleMapClick = (event: L.LeafletMouseEvent) => {
 };
 
 const renderMarkers = () => {
-  if (!map || !locationsLayer) return;
-  locationsLayer.clearLayers();
+  if (!map || !markersLayer) return;
+  markersLayer.clearLayers();
 
-  for (const location of props.locations) {
-    L.marker([location.lat, location.long])
-      .addTo(locationsLayer)
-      .bindPopup(`${location.id} ${location.lat}, ${location.long}`);
+  for (const marker of props.markers) {
+    L.marker([marker.lat, marker.long])
+      .addTo(markersLayer)
+      .bindPopup(`(${marker.id}) ${marker.lat}, ${marker.long}`);
   }
 };
 
-const flyToLocation = (id: number, lat: number, long: number) => {
+const flyToMarker = (id: number, lat: number, long: number) => {
   if (!map) return;
   map.flyTo([lat, long], 15, { duration: 1.2 });
 
-  if (!locationsLayer) return;
-  locationsLayer.eachLayer((layer) => {
+  if (!markersLayer) return;
+  markersLayer.eachLayer((layer) => {
     if (!(layer instanceof L.Marker)) return;
     const markerLatLng = layer.getLatLng();
 
     if (markerLatLng.lat === lat && markerLatLng.lng === long) {
-      layer.bindPopup(`${id} ${lat}, ${long}`).openPopup();
+      layer.bindPopup(`(${id}) ${lat}, ${long}`).openPopup();
     }
   });
 };
 
 defineExpose({
-  flyToLocation,
+  flyToMarker,
 });
 
 onMounted(() => {
   map = L.map('map-leaflet').setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM);
-  locationsLayer = L.layerGroup().addTo(map);
+  markersLayer = L.layerGroup().addTo(map);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -73,9 +72,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (map) {
     map.off('click', handleMapClick);
-    if (locationsLayer) {
-      locationsLayer.clearLayers();
-      locationsLayer = null;
+    if (markersLayer) {
+      markersLayer.clearLayers();
+      markersLayer = null;
     }
     map.remove();
     map = null;
@@ -83,7 +82,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => props.locations,
+  () => props.markers,
   () => {
     renderMarkers();
   },

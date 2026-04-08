@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import { getLocations, initializeDb, saveLocation } from './db';
+import { getMarkers, initializeDb, saveMarker } from './db';
 
 const app = express();
 const port = Number(process.env.PORT ?? 3001);
@@ -38,16 +38,16 @@ app.get('/api/health', (_, res) => {
   res.json({ ok: true });
 });
 
-app.get('/api/locations', async (_, res) => {
+app.get('/api/markers', async (_, res) => {
   try {
-    const locations = await getLocations();
-    res.json(locations);
+    const markers = await getMarkers();
+    res.json(markers);
   } catch (error) {
-    res.status(500).json({ message: 'Could not load locations', error });
+    res.status(500).json({ message: 'Could not load markers', error });
   }
 });
 
-app.post('/api/locations', async (req, res) => {
+app.post('/api/markers', async (req, res) => {
   const lat = Number(req.body?.lat);
   const long = Number(req.body?.long);
 
@@ -58,10 +58,10 @@ app.post('/api/locations', async (req, res) => {
 
   try {
     const address = await reverseGeocode(lat, long);
-    const id = await saveLocation(lat, long, address);
+    const id = await saveMarker(lat, long, address);
     res.status(201).json({ id, lat, long, address });
   } catch (error) {
-    res.status(500).json({ message: 'Could not save location', error });
+    res.status(500).json({ message: 'Could not save marker', error });
   }
 });
 

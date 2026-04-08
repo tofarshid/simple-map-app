@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sqlite3 from 'sqlite3';
 
-export interface Location {
+export interface Marker {
   id: number;
   lat: number;
   long: number;
@@ -41,9 +41,9 @@ export const initializeDb = (): Promise<void> =>
     });
   });
 
-export const getLocations = (): Promise<Location[]> =>
+export const getMarkers = (): Promise<Marker[]> =>
   new Promise((resolve, reject) => {
-    db.all<Location[]>(
+    db.all<Marker[]>(
       'SELECT id, lat, long, address FROM locations ORDER BY id DESC',
       (err, rows) => {
         if (err) {
@@ -55,7 +55,7 @@ export const getLocations = (): Promise<Location[]> =>
     );
   });
 
-export const saveLocation = (lat: number, long: number, address: string): Promise<number> =>
+export const saveMarker = (lat: number, long: number, address: string): Promise<number> =>
   new Promise((resolve, reject) => {
     db.run(
       'INSERT INTO locations (lat, long, address) VALUES (?, ?, ?)',

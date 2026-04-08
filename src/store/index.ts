@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 
-export interface Location {
+export interface Marker {
   id: number;
   lat: number;
   long: number;
@@ -8,25 +8,25 @@ export interface Location {
 }
 
 export interface RootState {
-  locations: Location[];
+  markers: Marker[];
   loading: boolean;
   error: string | null;
 }
 
-interface SaveLocationPayload {
+interface SaveMarkerPayload {
   lat: number;
   long: number;
 }
 
 export const store = createStore<RootState>({
   state: {
-    locations: [],
+    markers: [],
     loading: false,
     error: null,
   },
   mutations: {
-    setLocations(state, locations: Location[]) {
-      state.locations = locations;
+    setMarkers(state, markers: Marker[]) {
+      state.markers = markers;
     },
     setLoading(state, loading: boolean) {
       state.loading = loading;
@@ -36,17 +36,17 @@ export const store = createStore<RootState>({
     },
   },
   actions: {
-    async getLocations({ commit }) {
+    async getMarkers({ commit }) {
       const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
       commit('setLoading', true);
       commit('setError', null);
       try {
-        const response = await fetch(`${apiBase}/api/locations`);
+        const response = await fetch(`${apiBase}/api/markers`);
         if (!response.ok) {
-          throw new Error('Failed to fetch locations');
+          throw new Error('Failed to fetch markers');
         }
-        const locations = (await response.json()) as Location[];
-        commit('setLocations', locations);
+        const markers = (await response.json()) as Marker[];
+        commit('setMarkers', markers);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         commit('setError', message);
@@ -54,21 +54,21 @@ export const store = createStore<RootState>({
         commit('setLoading', false);
       }
     },
-    async saveLocation({ dispatch, commit }, payload: SaveLocationPayload) {
+    async saveMarker({ dispatch, commit }, payload: SaveMarkerPayload) {
       const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
       commit('setError', null);
       try {
-        const response = await fetch(`${apiBase}/api/locations`, {
+        const response = await fetch(`${apiBase}/api/markers`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-          throw new Error('Failed to save location');
+          throw new Error('Failed to save marker');
         }
 
-        await dispatch('getLocations');
+        await dispatch('getMarkers');
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
         commit('setError', message);
@@ -76,6 +76,6 @@ export const store = createStore<RootState>({
     },
   },
   getters: {
-    locationCount: (state) => state.locations.length,
+    markerCount: (state) => state.markers.length,
   },
 });

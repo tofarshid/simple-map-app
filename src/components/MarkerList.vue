@@ -1,38 +1,38 @@
 <script setup lang="ts">
-import type { Location } from '../store';
+import type { Marker } from '../store';
 
 defineProps<{
-  locations: Location[];
-  locationCount: number;
+  markers: Marker[];
+  markerCount: number;
   loading: boolean;
   error: string | null;
 }>();
 
 const emit = defineEmits<{
-  select: [location: Location];
+  select: [marker: Marker];
 }>();
 </script>
 
 <template>
   <div class="card shadow-sm">
     <div class="card-body">
-      <h2 class="h5 mb-3">Marker History | Count: {{ locationCount }}</h2>
+      <h2 class="h5 mb-3">Marker History | Count: {{ markerCount }}</h2>
       <p v-if="loading" class="text-muted">Loading...</p>
       <p v-if="error" class="text-danger">Error: {{ error }}</p>
       <ul class="marker-list scroll ps-0">
         <li
-          v-for="location in locations"
-          :key="location.id"
+          v-for="marker in markers"
+          :key="marker.id"
           class="d-flex justify-content-between"
           role="button"
         >
           <a
             type="button"
-            :title="` (${location.lat}, ${location.long})`"
+            :title="` (${marker.lat}, ${marker.long})`"
             class="on-hover btn text-decoration-none text-start text-black ps-1"
-            @click.prevent="emit('select', location)"
-            ><b>{{ location.id + ': ' }}</b
-            >{{ location.address }}</a
+            @click.prevent="emit('select', marker)"
+            ><b>{{ marker.id + ': ' }}</b
+            >{{ marker.address }}</a
           >
         </li>
       </ul>
