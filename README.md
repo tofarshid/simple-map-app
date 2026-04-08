@@ -10,7 +10,7 @@ Vue 3 app with a **Leaflet** map, **Vuex** state, and a small **Express + SQLite
 | Map | Leaflet |
 | State | Vuex 4 |
 | API | Express 5, `sqlite3`, CORS |
-| Quality | ESLint, Oxlint, Prettier (`semi: true`) |
+| Quality | ESLint, Oxlint, Prettier (`semi: true`), Vitest + Vue Test Utils |
 
 ## Features
 
@@ -30,6 +30,8 @@ Vue 3 app with a **Leaflet** map, **Vuex** state, and a small **Express + SQLite
 | `npm run build` | `vue-tsc` + production Vite build |
 | `npm run preview` | Preview the production build |
 | `npm run type-check` | Type-check only |
+| `npm run test` | Vitest (watch mode) |
+| `npm run test:run` | Vitest single run (CI-friendly) |
 | `npm run lint` | Oxlint + ESLint |
 | `npm run format` | Prettier on `src/` |
 
@@ -55,7 +57,7 @@ Optional: set `VITE_API_BASE_URL` if the client should call a different API orig
 
 ```
 src/
-  components/     App shell, MapCard, MarkerList
+  components/     App shell, MapCard, MarkerList; `__tests__/` for Vitest
   constants/      Map defaults (lat/lng/zoom)
   store/          Vuex store (markers, API actions)
   styles/         Scoped CSS pulled into components
