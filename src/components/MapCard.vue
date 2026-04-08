@@ -1,49 +1,49 @@
 <script setup lang="ts">
-import L from 'leaflet'
-import { onBeforeUnmount, onMounted, ref, render } from 'vue'
+import L from 'leaflet';
+import { onBeforeUnmount, onMounted, ref, render } from 'vue';
 
 /** Default center (Sydney–Parramatta area) */
-const DEFAULT_LAT = -33.81315
-const DEFAULT_LNG = 151.00745
-const DEFAULT_ZOOM = 13
+const DEFAULT_LAT = -33.81315;
+const DEFAULT_LNG = 151.00745;
+const DEFAULT_ZOOM = 13;
 
 const props = defineProps<{
-  location: [number, number, string] | null
-}>()
+  location: [number, number, string] | null;
+}>();
 
 const emit = defineEmits<{
-  (event: 'map-click', payload: { lat: number; lng: number }): void
-}>()
+  (event: 'map-click', payload: { lat: number; lng: number }): void;
+}>();
 
-let map: L.Map | null = null
-let locationsLayer: L.LayerGroup | null = null
-const handleMapClick = () => {}
-const renderMarkers = () => {}
+let map: L.Map | null = null;
+let locationsLayer: L.LayerGroup | null = null;
+const handleMapClick = () => {};
+const renderMarkers = () => {};
 
 onMounted(() => {
-  map = L.map('map-leaflet').setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM)
-  locationsLayer = L.layerGroup().addTo(map)
+  map = L.map('map-leaflet').setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM);
+  locationsLayer = L.layerGroup().addTo(map);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map)
+  }).addTo(map);
 
-  map.on('click', handleMapClick)
-  renderMarkers()
-})
+  map.on('click', handleMapClick);
+  renderMarkers();
+});
 
 onBeforeUnmount(() => {
   if (map) {
-    map.off('click', handleMapClick)
+    map.off('click', handleMapClick);
     if (locationsLayer) {
-      locationsLayer.clearLayers()
-      locationsLayer = null
+      locationsLayer.clearLayers();
+      locationsLayer = null;
     }
-    map.remove()
-    map = null
+    map.remove();
+    map = null;
   }
-})
+});
 </script>
 
 <template>

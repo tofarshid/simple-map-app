@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useStore } from 'vuex'
-import AppFooter from './components/AppFooter.vue'
-import AppHeader from './components/AppHeader.vue'
-import type { State } from './store'
-import MapCard from './components/MapCard.vue'
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import AppFooter from './components/AppFooter.vue';
+import AppHeader from './components/AppHeader.vue';
+import type { RootState } from './store';
+import MapCard from './components/MapCard.vue';
 
-const store = useStore<State>()
+const store = useStore<RootState>();
+const locations = computed(() => store.state.locations);
 
-const mapRef = ref<InstanceType<typeof MapCard> | null>(null)
+const mapRef = ref<InstanceType<typeof MapCard> | null>(null);
 </script>
 
 <template>
